@@ -201,10 +201,24 @@ add_flow_to_bin(std::vector<double> &data,
     data[bin + static_cast<size_t>(FlowVariable::NumAtoms)] += 1.0;
     data[bin + static_cast<size_t>(FlowVariable::Temp)    ] += mass * norm2(state->v[atom]);
     data[bin + static_cast<size_t>(FlowVariable::Mass)    ] += mass;
-    data[bin + static_cast<size_t>(FlowVariable::U)       ] += mass * state->v[atom][XX];
-    data[bin + static_cast<size_t>(FlowVariable::V)       ] += mass * state->v[atom][ZZ];
+    /* MICHELE */
+    /* Velocity needs to be binned accounting for the total mass at each time step, rather than
+     * mass at each binning window
+     */
 }
 
+/* MICHELE */
+static void
+add_velocity_temp(std::vector<double>& temp_data, 
+                  const size_t         atom,
+                  const size_t         temp_bin,
+                  const real           mass,
+                  const t_state*       state)
+{
+    temp_data[temp_bin + static_cast<size_t>(FlowVariable::Mass)] += mass;
+    temp_data[temp_bin + static_cast<size_t>(FlowVariable::Momx)] += mass * state->v[atom][XX];
+    temp_data[temp_bin + static_cast<size_t>(FlowVariable::Momz)] += mass * state->v[atom][ZZ];
+}
 
 static void
 collect_flow_data(FlowData           &flowcr,
@@ -232,13 +246,21 @@ collect_flow_data(FlowData           &flowcr,
             const auto mass = mdatoms->massT[i];
 
             add_flow_to_bin(flowcr.data, i, bin, mass, state);
+	    /* MICHELE */
+	    const auto temp_bin = flowcr.get_1d_index_temp(ix, iz);
+	    add_velocity_temp(/*...*/)
 
             if (!flowcr.group_data.empty() && index_group < static_cast<int>(flowcr.group_data.size()))
             {
                 add_flow_to_bin(flowcr.group_data.at(index_group).data, i, bin, mass, state);
             }
+
         }
     }
+
+    /* MICHELE */
+    flowcr.add_velocity_to_bins()
+
 }
 
 
@@ -275,6 +297,9 @@ calc_values_in_bin(const std::vector<double> &data,
 {
     const auto num_atoms = data[bin + static_cast<size_t>(FlowVariable::NumAtoms)];
     const auto mass      = data[bin + static_cast<size_t>(FlowVariable::Mass)    ];
+    /* MICHELE */
+    const auto vel_x 	 = data[bin + static_cast<size_t>(FlowVariable::U)];
+    const auto vel_z 	 = data[bin + static_cast<size_t>(FlowVariable::V)];
 
     // The temperature and flow is averaged by the sampled number 
     // of atoms and mass in each bin. 
@@ -282,22 +307,30 @@ calc_values_in_bin(const std::vector<double> &data,
         ? data[bin + static_cast<size_t>(FlowVariable::Temp)] / (2.0 * BOLTZ * num_atoms) 
         : 0.0;
 
-    const auto flow_x = mass > 0.0 ? data[bin + static_cast<size_t>(FlowVariable::U)] / mass : 0.0;
-    const auto flow_z = mass > 0.0 ? data[bin + static_cast<size_t>(FlowVariable::V)] / mass : 0.0;
+    /*  MICHELE */
+    // const auto flow_x = mass > 0.0 ? data[bin + static_cast<size_t>(FlowVariable::U)] / mass : 0.0;
+    // const auto flow_z = mass > 0.0 ? data[bin + static_cast<size_t>(FlowVariable::V)] / mass : 0.0;
+    /*  My understanding is that in this way the average speed is unbiased if and only if mass is nonzero for each
+     *  time step (i.e. time and space averages do not commute); velocity should be averaged in the same way as below
+     */
 
     // In contrast to above, the mass and number of atoms has to be divided by 
     // the number of samples taken to get their average.
     const auto num_samples = static_cast<float>(samples_per_output);
     const auto avg_num_atoms = num_atoms / num_samples;
     const auto avg_mass = mass / num_samples;
+    /* MICHELE */
+    const auto avg_vel_x = vel_x / num_samples;
+    const auto avg_vel_z = vel_z / num_samples;
 
     FlowBinData bin_data;
 
     bin_data.num_atoms = static_cast<float>(avg_num_atoms);
     bin_data.mass = static_cast<float>(avg_mass);
     bin_data.temp = static_cast<float>(temperature);
-    bin_data.u    = static_cast<float>(flow_x);
-    bin_data.v    = static_cast<float>(flow_z);
+    /* MICHELE */
+    bin_data.u    = static_cast<float>(avg_vel_x);
+    bin_data.v    = static_cast<float>(avg_vel_z);
 
     return bin_data;
 }

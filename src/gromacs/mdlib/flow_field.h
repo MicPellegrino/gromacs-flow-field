@@ -23,16 +23,36 @@ enum class FlowVariable {
     NumAtoms,
     Temp,
     Mass,   // Mass in bin (amu)
-    U,      // Mass flow along X
-    V,      //             and Z
+    /* MICHELE */
+    /* Remove Momx and Momz in future
+     */
+    U,      // Velocity along X
+    V,      //            and Z
+    Momx,   // Momentum along X
+    Momz,   //		  and Z
     NumVariables
 };
+
+/* MICHELE */
+/* Temporary flow data (i.e. live only for one time step)
+ */
+enum class TempVariable {
+    Mass,	// Mass in bin (amu)
+    Momx,   	// Momentum along X
+    Momz,   	//	      and Z
+    NumVariables
+};
+
 constexpr size_t NUM_FLOW_VARIABLES = static_cast<size_t>(FlowVariable::NumVariables);
+constexpr size_t NUM_TEMP_VARIABLES = static_cast<size_t>(TempVariable::NumVariables);
 
 struct GroupFlowData {
     std::string fnbase, 
                 name;
     std::vector<double> data;
+
+    /* MICHELE */
+    std::vector<double> temp_data;
 
     GroupFlowData(const std::string& fnbase_original, 
                   const std::string& group_name, 
@@ -53,7 +73,13 @@ public:
     std::string fnbase;
 
     std::vector<double> data;   // A 2D grid is represented by this 1D array
+    /* MICHELE */
+    std::vector<double> temp_data;
+
     std::vector<GroupFlowData> group_data; // Similar data for all separate atom groups
+    /* MICHELE */
+    /* Do we need temporary data for each group?
+     */
 
     uint64_t step_collect = 0, 
              step_output = 0,
@@ -75,6 +101,8 @@ public:
     :bDoFlowCollection { true },
      fnbase { fnbase },
      data(nx * nz * NUM_FLOW_VARIABLES, 0.0),
+     /* MICHELE */
+     temp_data(nx * nz * NUM_TEMP_VARIABLES, 0.0),
      step_collect { step_collect },
      step_output { step_output },
      step_ratio { static_cast<uint64_t>(step_output / step_collect) },
@@ -103,6 +131,14 @@ public:
         return (iz * nx() + ix) * NUM_FLOW_VARIABLES;
     }
 
+    /* MICHELE */
+    /* I don't like this solution, but I cannot find a elegent way to do otherwise
+     */
+    size_t get_1d_index_temp(const size_t ix, const size_t iz) const
+    {
+	return (iz * nx() + ix) * NUM_TEMP_VARIABLES;
+    }
+
     size_t get_xbin(const real x) const { return get_bin_from_position(x, nx(), inv_dx()); }
     size_t get_zbin(const real z) const { return get_bin_from_position(z, nz(), inv_dz()); }
 
@@ -116,6 +152,25 @@ public:
         {
             group.data.assign(group.data.size(), 0.0);
         }
+    }
+
+    /* MICHELE */
+    void add_velocity_to_bins() 
+    {
+        for ( size_t i = 0; i<nx(); ++i )
+	{
+	    for ( size_t j = 0; j<nz(); ++j )
+	    {
+	        size_t bin      = get_1d_index(i, j);
+		size_t temp_bin = get_1d_index_tmp(i, j);
+		auto mass = data[temp_bin + static_cast<size_t>(FlowVariable::Mass)];
+		auto px = data[temp_bin + static_cast<size_t>(FlowVariable::Momx)];
+		auto pz = data[temp_bin + static_cast<size_t>(FlowVariable::Momz)];
+		data[bin + static_cast<size_t>(FlowVariable::U)] += mass > 0.0 ? px / mass : 0.0;;
+    		data[bin + static_cast<size_t>(FlowVariable::V)] += mass > 0.0 ? pz / mass : 0.0;;
+	    }
+	}
+	reset_temp_data();	
     }
 
 private:
@@ -138,6 +193,16 @@ private:
     float get_position(const size_t index, const float bin_size) const
     {
         return (static_cast<float>(index) + 0.5) * bin_size;
+    }
+
+    /* MICHELE */
+    /* This is never called ouside (and should not be), so it may have sense to make it private
+     */
+    void reset_temp_data() { 
+        temp_data.assign(temp_data.size(), 0.0);
+	/* Groups?
+	 */
+	// ...
     }
 };
 
