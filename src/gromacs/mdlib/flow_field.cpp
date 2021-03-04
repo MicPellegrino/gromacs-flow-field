@@ -248,7 +248,7 @@ collect_flow_data(FlowData           &flowcr,
             add_flow_to_bin(flowcr.data, i, bin, mass, state);
 	    /* MICHELE */
 	    const auto temp_bin = flowcr.get_1d_index_temp(ix, iz);
-	    add_velocity_temp(/*...*/)
+	    add_velocity_temp(flowcr.temp_data, i, temp_bin, mass, state);
 
             if (!flowcr.group_data.empty() && index_group < static_cast<int>(flowcr.group_data.size()))
             {
