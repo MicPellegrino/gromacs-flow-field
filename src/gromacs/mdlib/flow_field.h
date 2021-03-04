@@ -162,7 +162,7 @@ public:
 	    for ( size_t j = 0; j<nz(); ++j )
 	    {
 	        size_t bin      = get_1d_index(i, j);
-		size_t temp_bin = get_1d_index_tmp(i, j);
+		size_t temp_bin = get_1d_index_temp(i, j);
 		auto mass = data[temp_bin + static_cast<size_t>(FlowVariable::Mass)];
 		auto px = data[temp_bin + static_cast<size_t>(FlowVariable::Momx)];
 		auto pz = data[temp_bin + static_cast<size_t>(FlowVariable::Momz)];

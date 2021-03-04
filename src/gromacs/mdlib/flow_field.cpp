@@ -259,7 +259,7 @@ collect_flow_data(FlowData           &flowcr,
     }
 
     /* MICHELE */
-    flowcr.add_velocity_to_bins()
+    flowcr.add_velocity_to_bins();
 
 }
 
