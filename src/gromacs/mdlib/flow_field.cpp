@@ -412,7 +412,8 @@ write_flow_data(const std::string    &fnbase,
     FILE *fp = gmx_ffopen(fn, "wb");
 
     const size_t num_elements = data.ix.size();
-    write_header(fp, nx, ny, dx, dy, num_elements);
+    /* MICHELE */
+    // write_header(fp, nx, ny, dx, dy, num_elements);
 
     fwrite(data.ix.data(),              sizeof(uint64_t), num_elements, fp);
     fwrite(data.iy.data(),              sizeof(uint64_t), num_elements, fp);
