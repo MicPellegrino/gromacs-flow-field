@@ -23,13 +23,13 @@ enum class FlowVariable {
     NumAtoms,
     Temp,
     Mass,   // Mass in bin (amu)
+    U,      // Velocity along X
+    V,      //            and Z
     /* MICHELE */
     /* Remove Momx and Momz in future
      */
-    U,      // Velocity along X
-    V,      //            and Z
-    Momx,   // Momentum along X
-    Momz,   //		  and Z
+    // Momx,   // Momentum along X
+    // Momz,   //	     and Z
     NumVariables
 };
 
@@ -161,7 +161,7 @@ public:
 	{
 	    for ( size_t j = 0; j<nz(); ++j )
 	    {
-	        size_t bin      = get_1d_index(i, j);
+	        // size_t bin      = get_1d_index(i, j);
 		size_t temp_bin = get_1d_index_temp(i, j);
 		auto mass = data[temp_bin + static_cast<size_t>(FlowVariable::Mass)];
 		auto px = data[temp_bin + static_cast<size_t>(FlowVariable::Momx)];
