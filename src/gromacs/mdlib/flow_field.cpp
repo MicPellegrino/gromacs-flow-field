@@ -246,6 +246,7 @@ collect_flow_data(FlowData           &flowcr,
             const auto mass = mdatoms->massT[i];
 
             add_flow_to_bin(flowcr.data, i, bin, mass, state);
+	    
 	    /* MICHELE */
 	    const auto temp_bin = flowcr.get_1d_index_temp(ix, iz);
 	    add_velocity_temp(flowcr.temp_data, i, temp_bin, mass, state);
@@ -297,6 +298,7 @@ calc_values_in_bin(const std::vector<double> &data,
 {
     const auto num_atoms = data[bin + static_cast<size_t>(FlowVariable::NumAtoms)];
     const auto mass      = data[bin + static_cast<size_t>(FlowVariable::Mass)    ];
+    
     /* MICHELE */
     const auto vel_x 	 = data[bin + static_cast<size_t>(FlowVariable::U)];
     const auto vel_z 	 = data[bin + static_cast<size_t>(FlowVariable::V)];
@@ -319,6 +321,7 @@ calc_values_in_bin(const std::vector<double> &data,
     const auto num_samples = static_cast<float>(samples_per_output);
     const auto avg_num_atoms = num_atoms / num_samples;
     const auto avg_mass = mass / num_samples;
+    
     /* MICHELE */
     const auto avg_vel_x = vel_x / num_samples;
     const auto avg_vel_z = vel_z / num_samples;
@@ -328,6 +331,7 @@ calc_values_in_bin(const std::vector<double> &data,
     bin_data.num_atoms = static_cast<float>(avg_num_atoms);
     bin_data.mass = static_cast<float>(avg_mass);
     bin_data.temp = static_cast<float>(temperature);
+
     /* MICHELE */
     bin_data.u    = static_cast<float>(avg_vel_x);
     bin_data.v    = static_cast<float>(avg_vel_z);
@@ -412,8 +416,9 @@ write_flow_data(const std::string    &fnbase,
     FILE *fp = gmx_ffopen(fn, "wb");
 
     const size_t num_elements = data.ix.size();
+    
     /* MICHELE */
-    // Maybe I should not write headers for testing purposes
+    // Maybe I should not write headers for testing purposes?
     write_header(fp, nx, ny, dx, dy, num_elements);
 
     fwrite(data.ix.data(),              sizeof(uint64_t), num_elements, fp);

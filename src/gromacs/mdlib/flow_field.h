@@ -73,6 +73,7 @@ public:
     std::string fnbase;
 
     std::vector<double> data;   // A 2D grid is represented by this 1D array
+    
     /* MICHELE */
     std::vector<double> temp_data;
 
@@ -163,9 +164,9 @@ public:
 	    {
 	        size_t bin      = get_1d_index(i, j);
 		size_t temp_bin = get_1d_index_temp(i, j);
-		auto mass = data[temp_bin + static_cast<size_t>(TempVariable::Mass)];
-		auto px = data[temp_bin + static_cast<size_t>(TempVariable::Momx)];
-		auto pz = data[temp_bin + static_cast<size_t>(TempVariable::Momz)];
+		auto mass = temp_data[temp_bin + static_cast<size_t>(TempVariable::Mass)];
+		auto px =   temp_data[temp_bin + static_cast<size_t>(TempVariable::Momx)];
+		auto pz =   temp_data[temp_bin + static_cast<size_t>(TempVariable::Momz)];
 		data[bin + static_cast<size_t>(FlowVariable::U)] += mass > 0.0 ? px / mass : 0.0;
     		data[bin + static_cast<size_t>(FlowVariable::V)] += mass > 0.0 ? pz / mass : 0.0;
 	    }
