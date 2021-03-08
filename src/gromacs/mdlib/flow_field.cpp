@@ -215,9 +215,9 @@ add_velocity_temp(std::vector<double>& temp_data,
                   const real           mass,
                   const t_state*       state)
 {
-    temp_data[temp_bin + static_cast<size_t>(FlowVariable::Mass)] += mass;
-    temp_data[temp_bin + static_cast<size_t>(FlowVariable::Momx)] += mass * state->v[atom][XX];
-    temp_data[temp_bin + static_cast<size_t>(FlowVariable::Momz)] += mass * state->v[atom][ZZ];
+    temp_data[temp_bin + static_cast<size_t>(TempVariable::Mass)] += mass;
+    temp_data[temp_bin + static_cast<size_t>(TempVariable::Momx)] += mass * state->v[atom][XX];
+    temp_data[temp_bin + static_cast<size_t>(TempVariable::Momz)] += mass * state->v[atom][ZZ];
 }
 
 static void
@@ -413,7 +413,8 @@ write_flow_data(const std::string    &fnbase,
 
     const size_t num_elements = data.ix.size();
     /* MICHELE */
-    // write_header(fp, nx, ny, dx, dy, num_elements);
+    // Maybe I should not write headers for testing purposes
+    write_header(fp, nx, ny, dx, dy, num_elements);
 
     fwrite(data.ix.data(),              sizeof(uint64_t), num_elements, fp);
     fwrite(data.iy.data(),              sizeof(uint64_t), num_elements, fp);
