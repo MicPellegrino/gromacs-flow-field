@@ -29,7 +29,7 @@ enum class FlowVariable {
     /* Remove Momx and Momz in future
      */
     // Momx,   // Momentum along X
-    // Momz,   //	     and Z
+    // Momz,   //		  and Z
     NumVariables
 };
 
@@ -161,13 +161,13 @@ public:
 	{
 	    for ( size_t j = 0; j<nz(); ++j )
 	    {
-	        // size_t bin      = get_1d_index(i, j);
+	        size_t bin      = get_1d_index(i, j);
 		size_t temp_bin = get_1d_index_temp(i, j);
-		auto mass = data[temp_bin + static_cast<size_t>(FlowVariable::Mass)];
-		auto px = data[temp_bin + static_cast<size_t>(FlowVariable::Momx)];
-		auto pz = data[temp_bin + static_cast<size_t>(FlowVariable::Momz)];
-		data[bin + static_cast<size_t>(FlowVariable::U)] += mass > 0.0 ? px / mass : 0.0;;
-    		data[bin + static_cast<size_t>(FlowVariable::V)] += mass > 0.0 ? pz / mass : 0.0;;
+		auto mass = data[temp_bin + static_cast<size_t>(TempVariable::Mass)];
+		auto px = data[temp_bin + static_cast<size_t>(TempVariable::Momx)];
+		auto pz = data[temp_bin + static_cast<size_t>(TempVariable::Momz)];
+		data[bin + static_cast<size_t>(FlowVariable::U)] += mass > 0.0 ? px / mass : 0.0;
+    		data[bin + static_cast<size_t>(FlowVariable::V)] += mass > 0.0 ? pz / mass : 0.0;
 	    }
 	}
 	reset_temp_data();	
