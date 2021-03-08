@@ -29,7 +29,7 @@ enum class FlowVariable {
     /* Remove Momx and Momz in future
      */
     // Momx,   // Momentum along X
-    // Momz,   //		  and Z
+    // Momz,   //            and Z
     NumVariables
 };
 
