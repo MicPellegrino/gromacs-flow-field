@@ -254,6 +254,7 @@ collect_flow_data(FlowData           &flowcr,
             if (!flowcr.group_data.empty() && index_group < static_cast<int>(flowcr.group_data.size()))
             {
                 add_flow_to_bin(flowcr.group_data.at(index_group).data, i, bin, mass, state);
+		add_velocity_temp(flowcr.group_data.at(index_group).temp_data, i, temp_bin, mass, state);
             }
 
         }

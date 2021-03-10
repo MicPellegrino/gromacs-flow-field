@@ -25,11 +25,6 @@ enum class FlowVariable {
     Mass,   // Mass in bin (amu)
     U,      // Velocity along X
     V,      //            and Z
-    /* MICHELE */
-    /* Remove Momx and Momz in future
-     */
-    // Momx,   // Momentum along X
-    // Momz,   //            and Z
     NumVariables
 };
 
@@ -58,7 +53,8 @@ struct GroupFlowData {
                   const std::string& group_name, 
                   const size_t num_data)
     :name { group_name },
-     data(num_data, 0.0)
+     data(num_data, 0.0),
+     temp_data(num_temp, 0.0)
     {
         fnbase.append(fnbase_original);
         fnbase.append("_");
@@ -72,15 +68,17 @@ public:
 
     std::string fnbase;
 
-    std::vector<double> data;   // A 2D grid is represented by this 1D array
+    std::vector<double> data;   		// A 2D grid is represented by this 1D array
     
     /* MICHELE */
     std::vector<double> temp_data;
 
-    std::vector<GroupFlowData> group_data; // Similar data for all separate atom groups
+    std::vector<GroupFlowData> group_data; 	// Similar data for all separate atom groups
+    
     /* MICHELE */
     /* Do we need temporary data for each group?
      */
+    std::vector<GroupFlowData> temp_group_data;	// ???
 
     uint64_t step_collect = 0, 
              step_output = 0,
@@ -102,8 +100,10 @@ public:
     :bDoFlowCollection { true },
      fnbase { fnbase },
      data(nx * nz * NUM_FLOW_VARIABLES, 0.0),
+     
      /* MICHELE */
      temp_data(nx * nz * NUM_TEMP_VARIABLES, 0.0),
+     
      step_collect { step_collect },
      step_output { step_output },
      step_ratio { static_cast<uint64_t>(step_output / step_collect) },
@@ -114,7 +114,10 @@ public:
      {
          for (const auto& name : group_names)
          {
-             group_data.push_back(GroupFlowData(fnbase, name, data.size()));
+	     /* MICHELE */
+	     /* Need temp for each group, in principle
+	      */
+             group_data.push_back(GroupFlowData( fnbase, name, data.size(), temp_data.size() ));
          }
      }
 
@@ -156,8 +159,11 @@ public:
     }
 
     /* MICHELE */
+    /* Coverts momenta stored in temp_data to velocities stored in data
+     */
     void add_velocity_to_bins() 
     {
+	const int num_groups = flowcr.group_data.empty() ? 1 : flowcr.group_data.size();
         for ( size_t i = 0; i<nx(); ++i )
 	{
 	    for ( size_t j = 0; j<nz(); ++j )
@@ -169,9 +175,17 @@ public:
 		auto pz =   temp_data[temp_bin + static_cast<size_t>(TempVariable::Momz)];
 		data[bin + static_cast<size_t>(FlowVariable::U)] += mass > 0.0 ? px / mass : 0.0;
     		data[bin + static_cast<size_t>(FlowVariable::V)] += mass > 0.0 ? pz / mass : 0.0;
+		for ( index_group = 0; index_group < num_groups; ++index_group )
+		{
+			mass = group_data.at(index_group).temp_data[temp_bin + static_cast<size_t>(TempVariable::Mass)];
+			px =   group_data.at(index_group).temp_data[temp_bin + static_cast<size_t>(TempVariable::Momx)];
+			pz =   group_data.at(index_group).temp_data[temp_bin + static_cast<size_t>(TempVariable::Momz)];
+			group_data.at(index_group).data[bin + static_cast<size_t>(FlowVariable::U)] += mass > 0.0 ? px / mass : 0.0;
+    			group_data.at(index_group).data[bin + static_cast<size_t>(FlowVariable::V)] += mass > 0.0 ? pz / mass : 0.0;
+		}
 	    }
 	}
-	reset_temp_data();	
+	reset_temp_data();
     }
 
 private:
@@ -197,13 +211,15 @@ private:
     }
 
     /* MICHELE */
-    /* This is never called ouside (and should not be), so it may have sense to make it private
+    /* This is never called ouside (and should never be), so it may have sense to make it private
      */
     void reset_temp_data() { 
         temp_data.assign(temp_data.size(), 0.0);
-	/* Groups?
-	 */
-	// ...
+	const int num_groups = flowcr.group_data.empty() ? 1 : flowcr.group_data.size();
+	for ( index_group = 0; index_group < num_groups; ++index_group )
+	{
+		group_data.at(index_group).temp_data.assing( group_data.at(index_group).temp_data.size(), 0.0 );
+	}
     }
 };
 
