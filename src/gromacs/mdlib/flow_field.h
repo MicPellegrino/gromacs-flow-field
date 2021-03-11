@@ -227,7 +227,7 @@ private:
 	const int num_groups = group_data.empty() ? 1 : group_data.size();
 	for ( int index_group = 0; index_group < num_groups; ++index_group )
 	{
-		group_data.at(index_group).temp_data.assing( group_data.at(index_group).temp_data.size(), 0.0 );
+		group_data.at(index_group).temp_data.assign( group_data.at(index_group).temp_data.size(), 0.0 );
 	}
     }
 };
