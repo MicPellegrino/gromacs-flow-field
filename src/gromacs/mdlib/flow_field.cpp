@@ -243,7 +243,7 @@ collect_flow_data(FlowData           &flowcr,
 	/* MICHELE */
 	const auto dt = flowcr.time_step;
 	const auto Lx = state->box[XX][XX];
-	const auto Lz = state->box[ZZ][ZZ]
+	const auto Lz = state->box[ZZ][ZZ];
 
         if (index_group < num_groups)
         {
