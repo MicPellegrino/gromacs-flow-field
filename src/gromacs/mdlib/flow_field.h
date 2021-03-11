@@ -84,8 +84,11 @@ public:
              step_output = 0,
              step_ratio = 0;
 
+    /* MICHELE */
+    /* This class probably need a copy constructor
+     */
     double bin_volume;
-    const double time_step;
+    double time_step;
 
     FlowData() {}
 
