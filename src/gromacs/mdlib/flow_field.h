@@ -157,12 +157,14 @@ public:
     float get_z(const size_t iz) const { return get_position(iz, dz()); }
 
     void reset_data() { 
-        data.assign(data.size(), 0.0)
+        
+	data.assign(data.size(), 0.0);
 
         for (auto& group : group_data)
         {
             group.data.assign(group.data.size(), 0.0);
         }
+
     }
 
     /* MICHELE */
