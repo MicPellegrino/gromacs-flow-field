@@ -85,6 +85,7 @@ public:
              step_ratio = 0;
 
     double bin_volume;
+    const double time_step;
 
     FlowData() {}
 
@@ -96,7 +97,8 @@ public:
              const double dy,
              const double dz,
              const uint64_t step_collect,
-             const uint64_t step_output)
+             const uint64_t step_output,
+	     const double dt)
     :bDoFlowCollection { true },
      fnbase { fnbase },
      data(nx * nz * NUM_FLOW_VARIABLES, 0.0),
@@ -110,7 +112,8 @@ public:
      bin_volume { dx * dy * dz },
      num_bins { nx, nz },
      bin_size { dx, dz },
-     inv_bin_size { 1.0 / dx, 1.0 / dz } 
+     inv_bin_size { 1.0 / dx, 1.0 / dz },
+     time_step { dt },
      {
          for (const auto& name : group_names)
          {
@@ -150,7 +153,7 @@ public:
     float get_z(const size_t iz) const { return get_position(iz, dz()); }
 
     void reset_data() { 
-        data.assign(data.size(), 0.0);
+        data.assign(data.size(), 0.0)
 
         for (auto& group : group_data)
         {
@@ -163,7 +166,7 @@ public:
      */
     void add_velocity_to_bins() 
     {
-	const int num_groups = flowcr.group_data.empty() ? 1 : flowcr.group_data.size();
+	const int num_groups = group_data.empty() ? 1 : group_data.size();
         for ( size_t i = 0; i<nx(); ++i )
 	{
 	    for ( size_t j = 0; j<nz(); ++j )
@@ -175,7 +178,7 @@ public:
 		auto pz =   temp_data[temp_bin + static_cast<size_t>(TempVariable::Momz)];
 		data[bin + static_cast<size_t>(FlowVariable::U)] += mass > 0.0 ? px / mass : 0.0;
     		data[bin + static_cast<size_t>(FlowVariable::V)] += mass > 0.0 ? pz / mass : 0.0;
-		for ( index_group = 0; index_group < num_groups; ++index_group )
+		for ( int index_group = 0; index_group < num_groups; ++index_group )
 		{
 			mass = group_data.at(index_group).temp_data[temp_bin + static_cast<size_t>(TempVariable::Mass)];
 			px =   group_data.at(index_group).temp_data[temp_bin + static_cast<size_t>(TempVariable::Momx)];
