@@ -139,13 +139,16 @@ init_flow_container(const int               nfile,
         }
     }
 
-    return FlowData(fnbase, group_names, nx, nz, dx, dy, dz, step_collect, step_output);
+    return FlowData(fnbase, group_names, nx, nz, dx, dy, dz, step_collect, step_output, ir->delta_t);
 }
 
 
 void 
-print_flow_collection_information(const FlowData &flowcr, const double dt) 
+print_flow_collection_information(const FlowData &flowcr) 
 {
+
+    const auto dt = flowcr.time_step;
+
     fprintf(stderr, "\n\n************************************\n");
     fprintf(stderr, "* FLOW DATA COLLECTION INFORMATION *\n");
     fprintf(stderr, "************************************\n\n");
@@ -236,11 +239,27 @@ collect_flow_data(FlowData           &flowcr,
         const auto index_global = DOMAINDECOMP(cr) ? cr->dd->globalAtomIndices[i] : static_cast<int>(i);
 
         const auto index_group = getGroupType(*groups, SimulationAtomGroupType::User1, index_global);
+	
+	/* MICHELE */
+	const auto dt = flowcr.time_step;
+	const auto Lx = state->box[XX][XX];
+	const auto Lz = state->box[ZZ][ZZ]
 
         if (index_group < num_groups)
         {
-            const auto ix = flowcr.get_xbin(state->x[i][XX]);
-            const auto iz = flowcr.get_zbin(state->x[i][ZZ]);
+	
+	    /* MICHELE */
+	    /* Half-step re-tracing to ensure positions and velocitis are not staggered
+	     */
+	    auto x_temp = state->x[i][XX] - state->v[atom][XX] * 0.5 * dt;
+	    auto z_temp = state->x[i][ZZ] - state->v[atom][ZZ] * 0.5 * dt;
+	    x_temp = x_temp >= Lx ? x_temp - Lx : x_temp;
+	    x_temp = x_temp < 0.0 ? x_temp + Lx : x_temp;
+	    z_temp = z_temp >= Lz ? z_temp - Lz : z_temp;
+	    z_temp = z_temp < 0.0 ? z_temp + Lz : z_temp;
+
+	    const auto ix = flowcr.get_xbin( x_temp );
+            const auto iz = flowcr.get_zbin( z_temp );
 
             const auto bin = flowcr.get_1d_index(ix, iz);
             const auto mass = mdatoms->massT[i];
