@@ -51,7 +51,8 @@ struct GroupFlowData {
 
     GroupFlowData(const std::string& fnbase_original, 
                   const std::string& group_name, 
-                  const size_t num_data)
+                  const size_t num_data,
+		  const size_t num_temp)
     :name { group_name },
      data(num_data, 0.0),
      temp_data(num_temp, 0.0)
@@ -221,8 +222,8 @@ private:
      */
     void reset_temp_data() { 
         temp_data.assign(temp_data.size(), 0.0);
-	const int num_groups = flowcr.group_data.empty() ? 1 : flowcr.group_data.size();
-	for ( index_group = 0; index_group < num_groups; ++index_group )
+	const int num_groups = group_data.empty() ? 1 : group_data.size();
+	for ( int index_group = 0; index_group < num_groups; ++index_group )
 	{
 		group_data.at(index_group).temp_data.assing( group_data.at(index_group).temp_data.size(), 0.0 );
 	}
