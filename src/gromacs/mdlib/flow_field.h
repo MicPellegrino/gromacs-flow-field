@@ -172,7 +172,7 @@ public:
      */
     void add_velocity_to_bins() 
     {
-	const int num_groups = group_data.empty() ? 1 : group_data.size();
+	// const int num_groups = group_data.empty() ? 1 : group_data.size();
         for ( size_t i = 0; i<nx(); ++i )
 	{
 	    for ( size_t j = 0; j<nz(); ++j )
@@ -184,6 +184,7 @@ public:
 		auto pz =   temp_data[temp_bin + static_cast<size_t>(TempVariable::Momz)];
 		data[bin + static_cast<size_t>(FlowVariable::U)] += mass > 0.0 ? px / mass : 0.0;
     		data[bin + static_cast<size_t>(FlowVariable::V)] += mass > 0.0 ? pz / mass : 0.0;
+		/*
 		for ( int index_group = 0; index_group < num_groups; ++index_group )
 		{
 			mass = group_data.at(index_group).temp_data[temp_bin + static_cast<size_t>(TempVariable::Mass)];
@@ -192,6 +193,7 @@ public:
 			group_data.at(index_group).data[bin + static_cast<size_t>(FlowVariable::U)] += mass > 0.0 ? px / mass : 0.0;
     			group_data.at(index_group).data[bin + static_cast<size_t>(FlowVariable::V)] += mass > 0.0 ? pz / mass : 0.0;
 		}
+		*/
 	    }
 	}
 	reset_temp_data();
@@ -224,11 +226,13 @@ private:
      */
     void reset_temp_data() { 
         temp_data.assign(temp_data.size(), 0.0);
+	/*
 	const int num_groups = group_data.empty() ? 1 : group_data.size();
 	for ( int index_group = 0; index_group < num_groups; ++index_group )
 	{
 		group_data.at(index_group).temp_data.assign( group_data.at(index_group).temp_data.size(), 0.0 );
 	}
+	*/
     }
 };
 
