@@ -242,7 +242,7 @@ init_flow_container(const int               nfile,
 
 // Write information about the flow field collection
 void 
-print_flow_collection_information(const FlowData &flowcr, const double dt);
+print_flow_collection_information(const FlowData &flowcr);
 
 // If at a collection or output step, perform actions
 void

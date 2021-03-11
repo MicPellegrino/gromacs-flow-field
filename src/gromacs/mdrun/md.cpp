@@ -708,8 +708,12 @@ void gmx::LegacySimulator::do_md()
 
         if (MASTER(cr))
         {
-            print_flow_collection_information(flowcr, ir->delta_t);
-        }
+	    	/*MICHELE*/
+            	/* Time-step in now stored in flowrc, so no need to pass it to this fuction
+		 */
+		// print_flow_collection_information(flowcr, ir->delta_t);
+        	print_flow_collection_information(flowcr);
+	}
     }
 
     step     = ir->init_step;
