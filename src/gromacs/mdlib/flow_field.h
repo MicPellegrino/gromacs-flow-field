@@ -117,7 +117,7 @@ public:
      num_bins { nx, nz },
      bin_size { dx, dz },
      inv_bin_size { 1.0 / dx, 1.0 / dz },
-     time_step { dt },
+     time_step { dt }
      {
          for (const auto& name : group_names)
          {
