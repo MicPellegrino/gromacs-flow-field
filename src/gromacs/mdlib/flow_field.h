@@ -206,7 +206,12 @@ private:
 
     size_t get_bin_from_position(const real x, const size_t num_bins, const real inv_bin) const
     {
-        auto index = static_cast<int>(floor(x * inv_bin)) % static_cast<int>(num_bins);
+        
+	/* MICHELE */
+	/* Berk suggested to use std::floor instead, in torder not to unvoluntarely convert from float to double
+	 */  
+	// auto index = static_cast<int>(floor(x * inv_bin)) % static_cast<int>(num_bins);
+	auto index = static_cast<int>(std::floor(x * inv_bin)) % static_cast<int>(num_bins);
 
         while (index < 0)
         {
