@@ -250,10 +250,14 @@ collect_flow_data(FlowData           &flowcr,
 	    /* Half-step re-tracing to ensure positions and velocitis are not staggered
 	     * First declare and then re-trace, otherwise it may change the type from float to double
 	     */
-	    auto x_temp = state->x[i][XX]; 
-	    x_temp -= state->v[i][XX] * 0.5 * dt;
-	    auto z_temp = state->x[i][ZZ]; 
-	    z_temp -= state->v[i][ZZ] * 0.5 * dt;
+	    auto x_temp = state->x[i][XX];
+	    auto z_temp = state->x[i][ZZ];
+	    
+	    if (FLOW_RETRACE)
+	    {
+	    	x_temp -= state->v[i][XX] * 0.5 * dt; 
+	    	z_temp -= state->v[i][ZZ] * 0.5 * dt;
+	    }
 
 	    const auto ix = flowcr.get_xbin( x_temp );
             const auto iz = flowcr.get_zbin( z_temp );

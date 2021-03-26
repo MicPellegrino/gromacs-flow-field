@@ -7,6 +7,10 @@
 
 #include "gromacs/mdtypes/state.h"
 
+#ifndef FLOW_RETRACE
+#define FLOW_RETRACE true
+#endif
+
 constexpr char FLOW_FILE_HEADER_NAME[] = "GMX_FLOW_2";
 
 // We are using a grid along X and Z so we use a separate enum 
@@ -156,7 +160,8 @@ public:
     float get_x(const size_t ix) const { return get_position(ix, dx()); }
     float get_z(const size_t iz) const { return get_position(iz, dz()); }
 
-    void reset_data() { 
+    void reset_data() 
+    { 
         
 	data.assign(data.size(), 0.0);
 
@@ -208,7 +213,7 @@ private:
     {
         
 	/* MICHELE */
-	/* Berk suggested to use std::floor instead, in torder not to unvoluntarely convert from float to double
+	/* Berk suggested to use std::floor instead, in order not to unvoluntarely convert from float to double
 	 */  
 	// auto index = static_cast<int>(floor(x * inv_bin)) % static_cast<int>(num_bins);
 	auto index = static_cast<int>(std::floor(x * inv_bin)) % static_cast<int>(num_bins);
@@ -229,7 +234,8 @@ private:
     /* MICHELE */
     /* This is never called ouside (and should never be), so it may have sense to make it private
      */
-    void reset_temp_data() { 
+    void reset_temp_data() 
+    { 
         temp_data.assign(temp_data.size(), 0.0);
 	/*
 	const int num_groups = group_data.empty() ? 1 : group_data.size();
