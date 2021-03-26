@@ -242,8 +242,6 @@ collect_flow_data(FlowData           &flowcr,
 	
 	/* MICHELE */
 	const auto dt = flowcr.time_step;
-	const auto Lx = state->box[XX][XX];
-	const auto Lz = state->box[ZZ][ZZ];
 
         if (index_group < num_groups)
         {
@@ -256,10 +254,6 @@ collect_flow_data(FlowData           &flowcr,
 	    x_temp -= state->v[i][XX] * 0.5 * dt;
 	    auto z_temp = state->x[i][ZZ]; 
 	    z_temp -= state->v[i][ZZ] * 0.5 * dt;
-	    // x_temp = x_temp >= Lx ? x_temp - Lx : x_temp;
-	    // x_temp = x_temp < 0.0 ? x_temp + Lx : x_temp;
-	    // z_temp = z_temp >= Lz ? z_temp - Lz : z_temp;
-	    // z_temp = z_temp < 0.0 ? z_temp + Lz : z_temp;
 
 	    const auto ix = flowcr.get_xbin( x_temp );
             const auto iz = flowcr.get_zbin( z_temp );
@@ -440,8 +434,6 @@ write_flow_data(const std::string    &fnbase,
 
     const size_t num_elements = data.ix.size();
     
-    /* MICHELE */
-    // Maybe I should not write headers for testing purposes?
     write_header(fp, nx, ny, dx, dy, num_elements);
 
     fwrite(data.ix.data(),              sizeof(uint64_t), num_elements, fp);
