@@ -256,7 +256,7 @@ init_flow_container(const int               nfile,
                     const t_inputrec       *ir,
                     const SimulationGroups *groups,
                     const t_state          *state,
-		    const bool		    rtx
+		    const bool		    rtx,
 		    const bool		    nvb);
 
 // Write information about the flow field collection
