@@ -215,8 +215,6 @@ private:
     {
         
 	/* MICHELE */
-	/* Berk suggested to use std::floor instead, in order not to unvoluntarely convert from float to double
-	 */  
 	// auto index = static_cast<int>(floor(x * inv_bin)) % static_cast<int>(num_bins);
 	auto index = static_cast<int>(std::floor(x * inv_bin)) % static_cast<int>(num_bins);
 

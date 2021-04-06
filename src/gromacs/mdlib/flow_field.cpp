@@ -216,14 +216,14 @@ add_flow_to_bin(std::vector<double> &data,
     data[bin + static_cast<size_t>(FlowVariable::Temp)    ] += mass * norm2(state->v[atom]);
     data[bin + static_cast<size_t>(FlowVariable::Mass)    ] += mass;
     /* MICHELE */
-    /* Velocity needs to be binned accounting for the total mass at each time step, rather than
-     * mass at each binning window
-     */
-    if (nvb)
+    if (!nvb)
     {
     	data[bin + static_cast<size_t>(FlowVariable::U)       ] += mass * state->v[atom][XX];
     	data[bin + static_cast<size_t>(FlowVariable::V)       ] += mass * state->v[atom][ZZ];
     }
+    /* According to the new binning procedure, velocity needs to be binned accounting for the 
+     * total mass at each time step, rather than mass at each binning window
+     */
 }
 
 /* MICHELE */
