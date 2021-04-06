@@ -132,6 +132,10 @@ struct MdrunOptions
     /* If true, perform re-tracing of atomic positions when binning flow fields
      */
     gmx_bool flow_rtx = FALSE;
+    /* MICHELE */
+    /* If true, perform separate binning for velocities and momenta
+     */
+    gmx_bool flow_nvb = FALSE;
 };
 
 } // end namespace gmx

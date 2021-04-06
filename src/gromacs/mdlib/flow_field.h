@@ -91,6 +91,7 @@ public:
     double bin_volume;
     double time_step;
     bool retrace;
+    bool new_velocity_binning;
 
     FlowData() {}
 
@@ -104,7 +105,8 @@ public:
              const uint64_t step_collect,
              const uint64_t step_output,
 	     const double dt,
-	     const bool rtx)
+	     const bool rtx,
+	     const bool nvb)
     :bDoFlowCollection { true },
      fnbase { fnbase },
      data(nx * nz * NUM_FLOW_VARIABLES, 0.0),
@@ -120,7 +122,8 @@ public:
      bin_size { dx, dz },
      inv_bin_size { 1.0 / dx, 1.0 / dz },
      time_step { dt },
-     retrace { rtx }
+     retrace { rtx },
+     new_velocity_binning { nvb },
      {
          for (const auto& name : group_names)
          {
@@ -253,7 +256,8 @@ init_flow_container(const int               nfile,
                     const t_inputrec       *ir,
                     const SimulationGroups *groups,
                     const t_state          *state,
-		    const bool		    rtx);
+		    const bool		    rtx
+		    const bool		    nvb);
 
 // Write information about the flow field collection
 void 

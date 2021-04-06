@@ -706,9 +706,11 @@ void gmx::LegacySimulator::do_md()
     {
        
 	/* MICHELE */
-	/* If mdrunOptions.flow_rtx=TRUE, then perform re-tracing of positions : x(t+0.5dt) = x(t)-0.5dt*v(t+0.5dt)
+	/* If mdrunOptions.flow_rtx=TRUE perform re-tracing of positions : x(t+0.5dt) = x(t)-0.5dt*v(t+0.5dt)
+	 */
+	/* If mdrunOptions.flow_nvb=TRUE perform new binning procedure for unbiased velocity in inhomogeneous phases
 	 */    
-	flowcr = init_flow_container(nfile, fnm, ir, groups, state, mdrunOptions.flow_rtx);
+	flowcr = init_flow_container(nfile, fnm, ir, groups, state, mdrunOptions.flow_rtx, mdrunOptions.flow_nvb);
 
         if (MASTER(cr))
         {

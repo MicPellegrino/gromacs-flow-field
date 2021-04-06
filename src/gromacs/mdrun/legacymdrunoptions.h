@@ -165,7 +165,7 @@ public:
 
     ImdOptions& imdOptions = mdrunOptions.imdOptions;
 
-    t_pargs pa[49] = {
+    t_pargs pa[50] = {
 
         { "-dd", FALSE, etRVEC, { &realddxyz }, "Domain decomposition grid, 0 is optimize" },
         { "-ddorder", FALSE, etENUM, { ddrank_opt_choices }, "DD rank order" },
@@ -279,6 +279,14 @@ public:
           etBOOL,
           { &mdrunOptions.flow_rtx },
           "Perform half-step re-tracing on atomic positions when performing flow variables binning" },
+	/* MICHELE */
+	/* Switching velocity binning on/off
+	 */
+	{ "-flow_nbv",
+          FALSE,
+          etBOOL,
+          { &mdrunOptions.flow_nvb },
+          "Bin flow velocities using the total mass for time-step, so to unbias cells with inhomogeneous density" },
         { "-nb", FALSE, etENUM, { nbpu_opt_choices }, "Calculate non-bonded interactions on" },
         { "-nstlist",
           FALSE,

@@ -56,7 +56,8 @@ init_flow_container(const int               nfile,
                     const t_inputrec       *ir,
                     const SimulationGroups *groups,
                     const t_state          *state,
-		    const bool		    rtx)
+		    const bool		    rtx,
+		    const bool		    nvb)
 {
     const auto step_collect = static_cast<uint64_t>(ir->userint1);
     auto step_output = static_cast<uint64_t>(ir->userint2);
@@ -140,7 +141,7 @@ init_flow_container(const int               nfile,
         }
     }
 
-    return FlowData(fnbase, group_names, nx, nz, dx, dy, dz, step_collect, step_output, ir->delta_t, rtx);
+    return FlowData(fnbase, group_names, nx, nz, dx, dy, dz, step_collect, step_output, ir->delta_t, rtx, nvb);
 }
 
 
@@ -188,7 +189,8 @@ print_flow_collection_information(const FlowData &flowcr)
     }
 	
     /* MICHELE */
-    fprintf(stderr, "Separate binning for velocities and momenta will be performed\n\n");
+    if (flowcr.new_velocity_binning)
+    	fprintf(stderr, "Separate binning for velocities and momenta will be performed\n\n");
 
     /* MICHELE */
     if (flowcr.retrace) 
