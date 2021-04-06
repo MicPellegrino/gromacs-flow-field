@@ -95,11 +95,6 @@ public:
     //! Parameters for replica-exchange simulations.
     ReplicaExchangeParameters replExParams;
 
-    /* MICHELE */
-    /* Dummy bool variable for flow_rtx
-     */
-    bool dummy_flow_rtx;
-
     //! Filename options to fill from command-line argument values.
     std::vector<t_filenm> filenames = { { { efTPR, nullptr, nullptr, ffREAD },
                                           { efTRN, "-o", nullptr, ffWRITE },
@@ -282,7 +277,7 @@ public:
 	{ "-flow_rtx",
           FALSE,
           etBOOL,
-          { &dummy_flow_rtx },
+          { &mdrunOptions.flow_rtx },
           "Perform half-step re-tracing on atomic positions when performing flow variables binning" },
         { "-nb", FALSE, etENUM, { nbpu_opt_choices }, "Calculate non-bonded interactions on" },
         { "-nstlist",

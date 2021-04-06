@@ -128,6 +128,10 @@ struct MdrunOptions
     gmx_bool verbose = FALSE;
     //! If verbose=true, print remaining runtime at this step interval
     int verboseStepPrintInterval = 100;
+    /* MICHELE */
+    /* If true, perform re-tracing of atomic positions when binning flow fields
+     */
+    gmx_bool flow_rtx = FALSE:
 };
 
 } // end namespace gmx
