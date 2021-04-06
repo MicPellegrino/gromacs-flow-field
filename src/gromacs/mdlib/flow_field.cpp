@@ -543,7 +543,7 @@ output_flow_data(FlowData               &flowcr,
             for (size_t iz = 0; iz < flowcr.nz(); ++iz)
             {
                 const auto bin = flowcr.get_1d_index(ix, iz);
-                const auto bin_data = calc_values_in_bin(flowcr.data, bin, flowcr.step_ratio);
+                const auto bin_data = calc_values_in_bin(flowcr.data, bin, flowcr.step_ratio, flowcr.new_velocity_binning);
                 add_bin_if_non_empty(system_bin_data, ix, iz, flowcr.bin_volume, bin_data);
 
                 for (size_t i = 0; i < flowcr.group_data.size(); ++i)
@@ -551,7 +551,7 @@ output_flow_data(FlowData               &flowcr,
                     const auto& data = flowcr.group_data.at(i).data;
                     auto& group_data = separate_group_bin_data.at(i);
 
-                    const auto group_bin_data = calc_values_in_bin(data, bin, flowcr.step_ratio);
+                    const auto group_bin_data = calc_values_in_bin(data, bin, flowcr.step_ratio, flowcr.new_velocity_binning);
                     add_bin_if_non_empty(group_data, ix, iz, flowcr.bin_volume, group_bin_data);
                 }
             }
