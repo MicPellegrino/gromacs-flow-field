@@ -704,12 +704,17 @@ void gmx::LegacySimulator::do_md()
 
     if (opt2bSet("-flow", nfile, fnm))
     {
-        flowcr = init_flow_container(nfile, fnm, ir, groups, state);
+       
+	/* MICHELE */
+	/* If this option is set, then perform re-tracing of positions : x(t+0.5dt) = x(t)-0.5dt*v(t+0.5dt)
+	 */
+	bool rtx = opt2bSet("-flow_rtx", nfile, fnm) ? true : false;    
+	flowcr = init_flow_container(nfile, fnm, ir, groups, state, rtx);
 
         if (MASTER(cr))
         {
-	    	/*MICHELE*/
-            	/* Time-step in now stored in flowrc, so no need to pass it to this fuction
+	    	/* MICHELE */
+            	/* Time-step in now stored in flowrc, so no need to pass it to this function
 		 */
 		// print_flow_collection_information(flowcr, ir->delta_t);
         	print_flow_collection_information(flowcr);

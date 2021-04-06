@@ -55,7 +55,8 @@ init_flow_container(const int               nfile,
                     const t_filenm          fnm[],
                     const t_inputrec       *ir,
                     const SimulationGroups *groups,
-                    const t_state          *state)
+                    const t_state          *state,
+		    const bool		    rtx)
 {
     const auto step_collect = static_cast<uint64_t>(ir->userint1);
     auto step_output = static_cast<uint64_t>(ir->userint2);
@@ -139,7 +140,7 @@ init_flow_container(const int               nfile,
         }
     }
 
-    return FlowData(fnbase, group_names, nx, nz, dx, dy, dz, step_collect, step_output, ir->delta_t);
+    return FlowData(fnbase, group_names, nx, nz, dx, dy, dz, step_collect, step_output, ir->delta_t, rtx);
 }
 
 
@@ -253,7 +254,8 @@ collect_flow_data(FlowData           &flowcr,
 	    auto x_temp = state->x[i][XX];
 	    auto z_temp = state->x[i][ZZ];
 	    
-	    if (FLOW_RETRACE)
+	    /* Switch retrace on/off */
+	    if (flowcr.retrace)
 	    {
 	    	x_temp -= state->v[i][XX] * 0.5 * dt; 
 	    	z_temp -= state->v[i][ZZ] * 0.5 * dt;

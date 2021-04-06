@@ -7,10 +7,6 @@
 
 #include "gromacs/mdtypes/state.h"
 
-#ifndef FLOW_RETRACE
-#define FLOW_RETRACE true
-#endif
-
 constexpr char FLOW_FILE_HEADER_NAME[] = "GMX_FLOW_2";
 
 // We are using a grid along X and Z so we use a separate enum 
