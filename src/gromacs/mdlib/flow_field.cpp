@@ -209,7 +209,8 @@ add_flow_to_bin(std::vector<double> &data,
                 const size_t         atom,
                 const size_t         bin,
                 const real           mass,
-                const t_state       *state)
+                const t_state       *state,
+		const bool	     nvb)
 {
     data[bin + static_cast<size_t>(FlowVariable::NumAtoms)] += 1.0;
     data[bin + static_cast<size_t>(FlowVariable::Temp)    ] += mass * norm2(state->v[atom]);
@@ -218,6 +219,11 @@ add_flow_to_bin(std::vector<double> &data,
     /* Velocity needs to be binned accounting for the total mass at each time step, rather than
      * mass at each binning window
      */
+    if (nvb)
+    {
+    	data[bin + static_cast<size_t>(FlowVariable::U)       ] += mass * state->v[atom][XX];
+    	data[bin + static_cast<size_t>(FlowVariable::V)       ] += mass * state->v[atom][ZZ];
+    }
 }
 
 /* MICHELE */
@@ -276,15 +282,16 @@ collect_flow_data(FlowData           &flowcr,
             const auto bin = flowcr.get_1d_index(ix, iz);
             const auto mass = mdatoms->massT[i];
 
-            add_flow_to_bin(flowcr.data, i, bin, mass, state);
+            add_flow_to_bin(flowcr.data, i, bin, mass, state, flowcr.new_velocity_binning);
 	    
 	    /* MICHELE */
 	    const auto temp_bin = flowcr.get_1d_index_temp(ix, iz);
-	    add_velocity_temp(flowcr.temp_data, i, temp_bin, mass, state);
+	    if (flowcr.new_velocity_binning)
+	    	add_velocity_temp(flowcr.temp_data, i, temp_bin, mass, state);
 
             if (!flowcr.group_data.empty() && index_group < static_cast<int>(flowcr.group_data.size()))
             {
-                add_flow_to_bin(flowcr.group_data.at(index_group).data, i, bin, mass, state);
+                add_flow_to_bin(flowcr.group_data.at(index_group).data, i, bin, mass, state, flowcr.new_velocity_binning);
 		add_velocity_temp(flowcr.group_data.at(index_group).temp_data, i, temp_bin, mass, state);
             }
 
@@ -292,7 +299,8 @@ collect_flow_data(FlowData           &flowcr,
     }
 
     /* MICHELE */
-    flowcr.add_velocity_to_bins();
+    if (flowcr.new_velocity_binning)
+    	flowcr.add_velocity_to_bins();
 
 }
 
@@ -326,12 +334,15 @@ struct FlowDataOutput {
 static FlowBinData 
 calc_values_in_bin(const std::vector<double> &data,
                    const size_t               bin,
-                   const uint64_t             samples_per_output)
+                   const uint64_t             samples_per_output,
+		   const bool		      nvb)
 {
     const auto num_atoms = data[bin + static_cast<size_t>(FlowVariable::NumAtoms)];
     const auto mass      = data[bin + static_cast<size_t>(FlowVariable::Mass)    ];
     
     /* MICHELE */
+    /* These are the new velocity variables obtained from the new binning procedure
+     */
     const auto vel_x 	 = data[bin + static_cast<size_t>(FlowVariable::U)];
     const auto vel_z 	 = data[bin + static_cast<size_t>(FlowVariable::V)];
 
@@ -341,9 +352,11 @@ calc_values_in_bin(const std::vector<double> &data,
         ? data[bin + static_cast<size_t>(FlowVariable::Temp)] / (2.0 * BOLTZ * num_atoms) 
         : 0.0;
 
-    /*  MICHELE */
-    // const auto flow_x = mass > 0.0 ? data[bin + static_cast<size_t>(FlowVariable::U)] / mass : 0.0;
-    // const auto flow_z = mass > 0.0 ? data[bin + static_cast<size_t>(FlowVariable::V)] / mass : 0.0;
+    /* MICHELE */
+    /* These variables are used in case the old velocity binning procedure is performed instead
+     */
+    const auto flow_x = mass > 0.0 ? data[bin + static_cast<size_t>(FlowVariable::U)] / mass : 0.0;
+    const auto flow_z = mass > 0.0 ? data[bin + static_cast<size_t>(FlowVariable::V)] / mass : 0.0;
     /*  My understanding is that in this way the average speed is unbiased if and only if mass is nonzero for each
      *  time step (i.e. time and space averages do not commute); velocity should be averaged in the same way as below
      */
@@ -354,7 +367,6 @@ calc_values_in_bin(const std::vector<double> &data,
     const auto avg_num_atoms = num_atoms / num_samples;
     const auto avg_mass = mass / num_samples;
     
-    /* MICHELE */
     const auto avg_vel_x = vel_x / num_samples;
     const auto avg_vel_z = vel_z / num_samples;
 
@@ -365,8 +377,16 @@ calc_values_in_bin(const std::vector<double> &data,
     bin_data.temp = static_cast<float>(temperature);
 
     /* MICHELE */
-    bin_data.u    = static_cast<float>(avg_vel_x);
-    bin_data.v    = static_cast<float>(avg_vel_z);
+    if (nvb)
+    {
+    	bin_data.u    = static_cast<float>(avg_vel_x);
+    	bin_data.v    = static_cast<float>(avg_vel_z);
+    }
+    else
+    {
+	bin_data.u    = static_cast<float>(flow_x);
+    	bin_data.v    = static_cast<float>(flow_z);
+    }
 
     return bin_data;
 }
