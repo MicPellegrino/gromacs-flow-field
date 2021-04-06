@@ -186,6 +186,13 @@ print_flow_collection_information(const FlowData &flowcr)
 
         fprintf(stderr, "\n");
     }
+	
+    /* MICHELE */
+    fprintf(stderr, "Separate binning for velocities and momenta will be performed\n\n");
+
+    /* MICHELE */
+    if (flowcr.retrace) 
+    	fprintf(stderr, "Half-step re-tracing of atomic positions will be performed\n\n");
 
     fprintf(stderr, "Have a nice day.\n\n");
 
