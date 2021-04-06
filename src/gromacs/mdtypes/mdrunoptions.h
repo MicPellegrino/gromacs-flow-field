@@ -131,7 +131,7 @@ struct MdrunOptions
     /* MICHELE */
     /* If true, perform re-tracing of atomic positions when binning flow fields
      */
-    gmx_bool flow_rtx = FALSE:
+    gmx_bool flow_rtx = FALSE;
 };
 
 } // end namespace gmx
