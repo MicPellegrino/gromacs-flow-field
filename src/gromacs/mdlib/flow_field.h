@@ -123,7 +123,7 @@ public:
      inv_bin_size { 1.0 / dx, 1.0 / dz },
      time_step { dt },
      retrace { rtx },
-     new_velocity_binning { nvb },
+     new_velocity_binning { nvb }
      {
          for (const auto& name : group_names)
          {
