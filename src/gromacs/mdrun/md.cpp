@@ -706,10 +706,9 @@ void gmx::LegacySimulator::do_md()
     {
        
 	/* MICHELE */
-	/* If this option is set, then perform re-tracing of positions : x(t+0.5dt) = x(t)-0.5dt*v(t+0.5dt)
-	 */
-	bool rtx = opt2bSet("-flow_rtx", nfile, fnm) ? true : false;    
-	flowcr = init_flow_container(nfile, fnm, ir, groups, state, rtx);
+	/* If mdrunOptions.flow_rtx=TRUE, then perform re-tracing of positions : x(t+0.5dt) = x(t)-0.5dt*v(t+0.5dt)
+	 */    
+	flowcr = init_flow_container(nfile, fnm, ir, groups, state, mdrunOptions.flow_rtx);
 
         if (MASTER(cr))
         {
